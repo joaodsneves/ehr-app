@@ -1,23 +1,36 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
 function App() {
+  // Estado para armazenar os pacientes
+  const [pacientes, setPacientes] = useState([]);
+
+  // Função para buscar pacientes do backend
+  const fetchPacientes = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/pacientes');
+      setPacientes(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar pacientes:', error);
+    }
+  };
+
+  // useEffect para buscar os pacientes ao carregar o componente
+  useEffect(() => {
+    fetchPacientes();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Pacientes</h1>
+      <ul>
+        {pacientes.map((paciente) => (
+          <li key={paciente.id}>
+            {paciente.nome} - {paciente.idade} anos - {paciente.endereco}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
