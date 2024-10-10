@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors'); // Adicionando CORS
 const { Sequelize, DataTypes } = require('sequelize');
 
 // Configurações do banco de dados
@@ -28,6 +29,10 @@ sequelize.sync();
 
 // Configuração do Express
 const app = express();
+
+// Middleware CORS para permitir requisições do frontend
+app.use(cors());
+
 app.use(express.json());
 
 // Rotas para o CRUD
@@ -43,21 +48,17 @@ app.get('/pacientes', async (req, res) => {
 
 app.put('/pacientes/:id', async (req, res) => {
   const paciente = await Paciente.findByPk(req.params.id);
-  paciente.update(req.body);
+  await paciente.update(req.body);
   res.json(paciente);
 });
 
 app.delete('/pacientes/:id', async (req, res) => {
   const paciente = await Paciente.findByPk(req.params.id);
-  paciente.destroy();
+  await paciente.destroy();
   res.json({ message: 'Paciente deletado' });
 });
 
-app.listen(5000, () => {
-  console.log('Servidor backend rodando na porta 5000');
-});
-
-// Adicionando rota para obter um paciente por ID
+// Rota para obter um paciente por ID
 app.get('/pacientes/:id', async (req, res) => {
   try {
     const paciente = await Paciente.findByPk(req.params.id);
@@ -69,4 +70,9 @@ app.get('/pacientes/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Erro ao buscar paciente', error: error.message });
   }
+});
+
+// Inicia o servidor na porta 5000
+app.listen(5000, () => {
+  console.log('Servidor backend rodando na porta 5000');
 });
